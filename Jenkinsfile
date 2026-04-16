@@ -27,8 +27,15 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
-                    bat '@echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKERHUB_USERNAME',
+                    passwordVariable: 'DOCKERHUB_TOKEN'
+                )]) {
+                    bat '''
+                    @echo off
+                    echo %DOCKERHUB_TOKEN% | docker login --username %DOCKERHUB_USERNAME% --password-stdin
+                    '''
                 }
             }
         }
@@ -48,7 +55,9 @@ pipeline {
         stage('Trigger Render Deploy') {
             steps {
                 withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
-                    bat 'curl -X POST "%RENDER_HOOK%"'
+                    powershell '''
+                    Invoke-WebRequest -Uri $env:RENDER_HOOK -Method Post
+                    '''
                 }
             }
         }
