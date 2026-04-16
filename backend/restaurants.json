@@ -6,13 +6,8 @@
     "location": "Nizamabad",
     "menu": [
       { "category": "Soups", "name": "Tomato Soup", "price": 110 },
-      { "category": "Soups", "name": "Veg Corn Soup", "price": 110 },
-      { "category": "Soups", "name": "Sweet Corn Soup", "price": 110 },
-      { "category": "Snacks", "name": "Veg Manchuria Dry", "price": 140 },
       { "category": "Snacks", "name": "French Fries", "price": 120 },
-      { "category": "Roti", "name": "Butter Roti", "price": 35 },
-      { "category": "Rice", "name": "Jeera Rice", "price": 160 },
-      { "category": "Paneer Curries", "name": "Paneer Butter Masala", "price": 205 }
+      { "category": "Roti", "name": "Butter Roti", "price": 35 }
     ]
   }
 ]
