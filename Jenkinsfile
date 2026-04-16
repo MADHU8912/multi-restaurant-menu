@@ -26,12 +26,12 @@ pipeline {
         }
 
         stage('Docker Login') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
-            bat '@echo off && echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin'
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
+                    bat 'docker login -u %DOCKERHUB_USERNAME% -p %DOCKERHUB_TOKEN%'
+                }
+            }
         }
-    }
-}
 
         stage('Docker Push') {
             steps {
@@ -39,21 +39,20 @@ pipeline {
             }
         }
 
-        stage('Docker Pull') {
+        stage('Trigger Render Deploy') {
             steps {
-                bat 'docker pull %IMAGE_NAME%'
-            }
-        }
-
-        stage('Build Report') {
-            steps {
-                bat 'echo Pipeline success > build-report.txt'
-                archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
+                withCredentials([string(credentialsId: 'render-hook', variable: 'RENDER_HOOK')]) {
+                    bat 'curl -X POST "%RENDER_HOOK%"'
+                }
             }
         }
     }
 
     post {
+        success {
+            bat 'echo Pipeline completed successfully > build-report.txt'
+            archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
+        }
         failure {
             bat 'echo Pipeline failed > build-report.txt'
             archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
