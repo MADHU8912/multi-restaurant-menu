@@ -1,4 +1,4 @@
-fetch("https://multi-restaurant-menu.onrender.com/restaurants")
+fetch("https://multi-restaurant-menu-docker.onrender.com/restaurants")
   .then(response => response.json())
   .then(data => {
     const container = document.getElementById("restaurants");
