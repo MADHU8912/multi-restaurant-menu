@@ -39,6 +39,12 @@ pipeline {
             }
         }
 
+        stage('Docker Pull') {
+            steps {
+                bat 'docker pull %IMAGE_NAME%'
+            }
+        }
+
         stage('Trigger Render Deploy') {
             steps {
                 withCredentials([string(credentialsId: 'render-hook', variable: 'RENDER_HOOK')]) {
@@ -46,13 +52,16 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Report') {
+            steps {
+                bat 'echo Pipeline completed successfully > build-report.txt'
+                archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
+            }
+        }
     }
 
     post {
-        success {
-            bat 'echo Pipeline completed successfully > build-report.txt'
-            archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
-        }
         failure {
             bat 'echo Pipeline failed > build-report.txt'
             archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
