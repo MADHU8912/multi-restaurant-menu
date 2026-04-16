@@ -1,29 +1,61 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "nikhilabba12/multi-restaurant-menu:latest"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'YOUR_GITHUB_REPO_URL'
+                checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Show Files') {
             steps {
-                bat 'echo Build successful'
-            }
-        }
-
-        stage('Report') {
-            steps {
-                bat 'echo Build report created > build-report.txt'
+                bat 'dir'
+                bat 'dir backend'
             }
         }
 
         stage('Docker Build') {
             steps {
-                bat 'docker build -t multi-restaurant-menu .'
+                bat 'docker build -t %IMAGE_NAME% .'
             }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
+                    bat 'docker login -u %DOCKERHUB_USERNAME% -p %DOCKERHUB_TOKEN%'
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                bat 'docker push %IMAGE_NAME%'
+            }
+        }
+
+        stage('Trigger Render Deploy') {
+            steps {
+                withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
+                    bat 'curl -X POST "%RENDER_HOOK%"'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            bat 'echo Pipeline completed successfully > build-report.txt'
+            archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
+        }
+        failure {
+            bat 'echo Pipeline failed > build-report.txt'
+            archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
         }
     }
 }
