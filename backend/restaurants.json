@@ -9,5 +9,27 @@
       { "category": "Snacks", "name": "French Fries", "price": 120 },
       { "category": "Roti", "name": "Butter Roti", "price": 35 }
     ]
+  },
+  {
+    "id": 2,
+    "name": "Waff-Wich Cafe",
+    "type": "Fast Food",
+    "location": "Hyderabad",
+    "menu": [
+      { "category": "Waffles", "name": "Classic Waffle", "price": 149 },
+      { "category": "Sandwiches", "name": "Veg Sandwich", "price": 99 },
+      { "category": "Drinks", "name": "Cold Coffee", "price": 89 }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Pizza Town",
+    "type": "Italian",
+    "location": "Karimnagar",
+    "menu": [
+      { "category": "Pizza", "name": "Margherita", "price": 199 },
+      { "category": "Pizza", "name": "Farmhouse", "price": 249 },
+      { "category": "Sides", "name": "Garlic Bread", "price": 99 }
+    ]
   }
 ]

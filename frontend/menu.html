@@ -8,59 +8,46 @@
 </head>
 <body>
   <header>
-    <h1>Satvic Kitchen</h1>
-    <p>Menu Card</p>
+    <h1 id="restaurant-name">Restaurant Menu</h1>
+    <p id="restaurant-info"></p>
     <a href="index.html">← Back</a>
   </header>
 
-  <main class="menu-container">
-    <section class="menu-category">
-      <h2>Soups</h2>
-      <p>Tomato Soup - ₹110</p>
-      <p>Veg Corn Soup - ₹110</p>
-      <p>Sweet Corn Soup - ₹110</p>
-      <p>Hot & Sour Soup - ₹120</p>
-      <p>Manchow Soup - ₹120</p>
-    </section>
-
-    <section class="menu-category">
-      <h2>Snacks</h2>
-      <p>Veg Manchuria Dry - ₹140</p>
-      <p>Veg Manchuria Wet - ₹140</p>
-      <p>Gobhi Manchuria Dry - ₹153</p>
-      <p>Aloo 65 - ₹140</p>
-      <p>Veg 65 - ₹150</p>
-      <p>French Fries - ₹120</p>
-    </section>
-
-    <section class="menu-category">
-      <h2>Roti</h2>
-      <p>Phulka - ₹20</p>
-      <p>Butter Roti - ₹35</p>
-      <p>Roti - ₹25</p>
-      <p>Plain Naan - ₹50</p>
-      <p>Butter Naan - ₹60</p>
-      <p>Garlic Naan - ₹70</p>
-    </section>
-
-    <section class="menu-category">
-      <h2>Rice</h2>
-      <p>Jeera Rice - ₹160</p>
-      <p>Curd Rice - ₹110</p>
-      <p>Plain Rice - ₹110</p>
-      <p>Veg Fried Rice - ₹150</p>
-      <p>Veg Biryani Half - ₹130</p>
-      <p>Veg Biryani Full - ₹210</p>
-    </section>
-
-    <section class="menu-category">
-      <h2>Paneer Curries</h2>
-      <p>Paneer Butter Masala - ₹205</p>
-      <p>Palak Paneer - ₹205</p>
-      <p>Mutter Paneer - ₹205</p>
-      <p>Paneer Burji Dry - ₹225</p>
-      <p>Kadai Paneer - ₹225</p>
-    </section>
+  <main>
+    <div id="menu-items"></div>
   </main>
+
+  <script>
+    fetch("https://multi-restaurant-menu.onrender.com/restaurants")
+      .then(response => response.json())
+      .then(data => {
+        const selectedId = localStorage.getItem("selectedRestaurantId");
+        const restaurant = data.find(r => r.id == selectedId);
+
+        if (!restaurant) {
+          document.getElementById("menu-items").innerHTML = "<p>No menu found.</p>";
+          return;
+        }
+
+        document.getElementById("restaurant-name").textContent = restaurant.name;
+        document.getElementById("restaurant-info").textContent =
+          restaurant.type + " - " + restaurant.location;
+
+        const menuContainer = document.getElementById("menu-items");
+
+        restaurant.menu.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "menu-category";
+          div.innerHTML = `
+            <h3>${item.category}</h3>
+            <p>${item.name} - ₹${item.price}</p>
+          `;
+          menuContainer.appendChild(div);
+        });
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+  </script>
 </body>
 </html>
