@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "nikhilabba12/multi-restaurant-menu:latest"
+        IMAGE_NAME = 'nikhilabba12/multi-restaurant-menu:latest'
     }
 
     stages {
@@ -26,16 +26,13 @@ pipeline {
         }
 
         stage('Docker Login') {
-    steps {
-        withCredentials([usernamePassword(
-            credentialsId: 'dockerhub-creds',
-            usernameVariable: 'DOCKERHUB_USERNAME',
-            passwordVariable: 'DOCKERHUB_TOKEN'
-        )]) {
-            bat '@echo %DOCKERHUB_TOKEN% | docker login --username %DOCKERHUB_USERNAME% --password-stdin'
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
+                    bat 'echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin'
+                }
+            }
         }
-    }
-}
+
         stage('Docker Push') {
             steps {
                 bat 'docker push %IMAGE_NAME%'
@@ -48,20 +45,15 @@ pipeline {
             }
         }
 
-        stage('Trigger Render Deploy') {
+        stage('Build Report') {
             steps {
-                withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_HOOK')]) {
-                    powershell 'Invoke-WebRequest -Uri $env:RENDER_HOOK -Method Post'
-                }
+                bat 'echo Pipeline success > build-report.txt'
+                archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
             }
         }
     }
 
     post {
-        success {
-            bat 'echo Pipeline completed successfully > build-report.txt'
-            archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
-        }
         failure {
             bat 'echo Pipeline failed > build-report.txt'
             archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
