@@ -20,31 +20,30 @@ pipeline {
         }
 
         stage('Docker Build') {
-            steps {
-                bat 'docker build -t %IMAGE_NAME% .'
-            }
-        }
+    steps {
+        bat 'docker build -t nikhilabba12/multi-restaurant-menu:latest .'
+    }
+}
 
-        stage('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
-                    bat 'echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin'
-                }
-            }
+stage('Docker Login') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
+            bat 'echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin'
         }
+    }
+}
 
-        stage('Docker Push') {
-            steps {
-                bat 'docker push %IMAGE_NAME%'
-            }
-        }
+stage('Docker Push') {
+    steps {
+        bat 'docker push nikhilabba12/multi-restaurant-menu:latest'
+    }
+}
 
-        stage('Docker Pull') {
-            steps {
-                bat 'docker pull %IMAGE_NAME%'
-            }
-        }
-
+stage('Docker Pull') {
+    steps {
+        bat 'docker pull nikhilabba12/multi-restaurant-menu:latest'
+    }
+}
         stage('Trigger Render Deploy') {
             steps {
                 withCredentials([string(credentialsId: 'render-hook', variable: 'RENDER_HOOK')]) {
