@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'nikhilabba12/multi-restaurant-menu'
-        IMAGE_TAG = 'latest'
+        IMAGE_TAG  = 'latest'
+        RENDER_HOOK = 'YOUR_RENDER_DEPLOY_HOOK_URL'
     }
 
     stages {
@@ -17,6 +18,7 @@ pipeline {
             steps {
                 bat 'dir'
                 bat 'dir backend'
+                bat 'dir frontend'
             }
         }
 
@@ -59,7 +61,7 @@ pipeline {
 
         stage('Trigger Render Deploy') {
             steps {
-                echo 'Add your Render deploy hook here'
+                powershell 'Invoke-WebRequest -Uri "%RENDER_HOOK%" -Method Post'
             }
         }
 
@@ -68,6 +70,7 @@ pipeline {
                 bat '''
                 echo Build successful > build-report.txt
                 echo Image: %IMAGE_NAME%:%IMAGE_TAG% >> build-report.txt
+                echo Deploy triggered to Render >> build-report.txt
                 '''
             }
         }
@@ -78,7 +81,10 @@ pipeline {
             archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
         }
         failure {
-            bat 'echo Pipeline failed > build-report.txt'
+            bat '''
+            echo Pipeline failed > build-report.txt
+            echo Check Jenkins stage logs for error >> build-report.txt
+            '''
             archiveArtifacts artifacts: 'build-report.txt', fingerprint: true
         }
     }
