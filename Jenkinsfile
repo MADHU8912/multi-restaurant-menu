@@ -29,12 +29,6 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
-            }
-        }
-
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
@@ -44,6 +38,12 @@ pipeline {
                 )]) {
                     bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
                 }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
             }
         }
 
